@@ -28,7 +28,7 @@ model Admin {
   email        String   @unique
   profilePhoto String?
   contactNo    String
-  isDeleted    Boolean
+  isDeleted    Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
 
