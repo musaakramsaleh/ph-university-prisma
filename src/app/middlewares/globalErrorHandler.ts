@@ -3,7 +3,7 @@ import httpStatus from "http-status";
 const globalErrorhandler = (err:any,req:Request,res:Response,next:NextFunction)=>{
    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
          success: false,
-         message: (err as Error)?.name || "Something went wrong",
+         message: (err as Error)?.message || "Something went wrong",
          error: err
    })
 }
