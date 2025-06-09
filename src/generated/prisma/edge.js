@@ -155,7 +155,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Admin\\Desktop\\ph-University\\src\\generated\\prisma",
+      "value": "C:\\Users\\HP\\Desktop\\POSTGRES\\ph-university-prisma\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -169,7 +169,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Admin\\Desktop\\ph-University\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\HP\\Desktop\\POSTGRES\\ph-university-prisma\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -183,7 +183,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

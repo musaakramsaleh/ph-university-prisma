@@ -12,27 +12,28 @@ interface CreateAdminInput {
     password: string;
 }
 
-const createAdmin = async(data:CreateAdminInput) =>{
-    const hashedPassword:string = await bcrypt.hash(data.password,12)
-    const userData = {
-        email : data.admin.email,
-        password: hashedPassword,
-        role: UserRole.ADMIN
-    }
-    const result = await prisma.$transaction(async(transactionClient)=>{
-        const createdUserData = await transactionClient.user.create({
-            data: userData
-        });
+const createAdmin = async (req: any) => {
+    
+    // const hashedPassword:string = await bcrypt.hash(data.password,12)
+    // const userData = {
+    //     email : data.admin.email,
+    //     password: hashedPassword,
+    //     role: UserRole.ADMIN
+    // }
+    // const result = await prisma.$transaction(async(transactionClient)=>{
+    //     const createdUserData = await transactionClient.user.create({
+    //         data: userData
+    //     });
 
-        const createdAdminData = await transactionClient.admin.create({
-            data: {
-                ...data.admin,
-                isDeleted: false // or true, depending on your logic
-            }
-        })
-        return createdAdminData
-    })
-    return result
+    //     const createdAdminData = await transactionClient.admin.create({
+    //         data: {
+    //             ...data.admin,
+    //             isDeleted: false // or true, depending on your logic
+    //         }
+    //     })
+    //     return createdAdminData
+    // })
+    // return result
 }
 
 export const userService = {
