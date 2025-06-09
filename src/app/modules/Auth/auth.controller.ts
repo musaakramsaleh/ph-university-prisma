@@ -33,7 +33,7 @@ const refreshToken = catchAsync(async (req:Request,res:Response)=>{
     data: result
    })
 })
-const changedPassword = catchAsync(async (req:Request,res:Response)=>{
+const changedPassword = catchAsync(async (req:Request & {user?:any},res:Response)=>{
   const result = await authServices.changePassword(req.user,req.body)
   sendResponse(res, {
     statusCode:httpStatus.OK,
@@ -43,8 +43,17 @@ const changedPassword = catchAsync(async (req:Request,res:Response)=>{
    })
 }
 )
+const forgetPassword = catchAsync(async(req,res)=>{
+  sendResponse(res,{
+    statusCode:httpStatus.OK,
+    success:true,
+    message: '',
+    data: res
+  })
+})
 export const authController = {
     loginUser,
     refreshToken,
-    changedPassword
+    changedPassword,
+    forgetPassword
 }

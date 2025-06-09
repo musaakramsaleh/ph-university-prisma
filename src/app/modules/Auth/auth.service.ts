@@ -87,8 +87,18 @@ const changePassword = async (user:any,payload:any)=>{
     message: "Password changed successfully"
   }
 }
+const forgetPaaword = async(payload: {email:string}) => {
+ const userExist = await prisma.user.findUniqueOrThrow({
+  where: {
+    email: payload.email,
+    status: UserStatus.ACTIVE
+  }
+ })
+ const resetPasswordToken = generateToken({email:userExist.email,role:userExist.role},config.jwt.jwt_secret as jwt.Secret ,'5min')
+}
 export const authServices = {
     loginUser,
     refreshToken,
-    changePassword
+    changePassword,
+    forgetPaaword
   }

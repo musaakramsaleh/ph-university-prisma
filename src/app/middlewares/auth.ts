@@ -5,7 +5,7 @@ import { verifyToken } from "../../helpers/jwtHelper";
 import config from "../../config";
 import ApiError from "../errors/ApiErrors";
 export const auth = (...roles: string[]) => {
- return async (req: Request, res: Response, next: NextFunction) => {
+ return async (req: Request & {user?:any}, res: Response, next: NextFunction) => {
    try{
     const token = req.headers.authorization;
     if(!token){
