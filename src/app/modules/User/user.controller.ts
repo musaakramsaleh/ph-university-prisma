@@ -1,9 +1,7 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { userService } from "./user.service";
 
-const createAdmin = async (req:Request,res:Response) => {
-    console.log(req.file);
-    console.log(req.body.data);
+const createAdmin = async (req:Request,res:Response,next:NextFunction) => {
     try {
         const result = await userService.createAdmin(req);
     res.status(200).json({
@@ -19,7 +17,41 @@ const createAdmin = async (req:Request,res:Response) => {
       })  
     }
 }
+const createDoctor = async (req:Request,res:Response,next:NextFunction) => {
+    try {
+        const result = await userService.createDoctor(req);
+    res.status(200).json({
+        success:true,
+        message: "Doctor created successfully",
+        data: result
+    })
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: (error as Error)?.name || "Something went wrong",
+        error: error
+      })  
+    }
+}
+const createPatient = async (req:Request,res:Response,next:NextFunction) => {
+    try {
+        const result = await userService.createPatient(req);
+    res.status(200).json({
+        success:true,
+        message: "patient created successfully",
+        data: result
+    })
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: (error as Error)?.name || "Something went wrong",
+        error: error
+      })  
+    }
+}
 
 export const userController = {
-    createAdmin
+    createAdmin,
+    createDoctor,
+    createPatient
 }
