@@ -1,8 +1,13 @@
-import { UserRole } from "../../../generated/prisma"
+import { Prisma, UserRole } from "../../../generated/prisma"
 import * as bcrypt from 'bcrypt'
 import { prisma } from "../../../shared/prisma";
 import { uploadToCloudinary } from "../../../helpers/fileUploader";
 import { IFile } from "../../interfaces/file";
+import { profile } from "console";
+import { calculatePagination } from "../../../helpers/paginationHelper";
+import { IPaginationOptions } from "../../interfaces/pagination";
+import { usersearchalefields } from "./user.constant";
+import { Request } from "express";
 interface AdminData {
     name: string;
     email: string;
@@ -95,9 +100,117 @@ const createPatient = async (req: any) => {
     })
     return result
 }
-
+const getUsers = async(req:any)=>{
+    const result = await prisma.user.findMany({
+           include:{
+            admin:true,
+            patient:true,
+            doctor:true
+           }
+        })
+    const structuredUsers = result.map(user=>{
+        let UserRole = null;
+        let userData = {}
+        if(user.admin){
+            UserRole = 'admin';
+            userData = user.admin;
+        }else if(user.doctor){
+            UserRole = "doctor";
+            userData = user.doctor;
+        }else if(user.patient){
+            UserRole = "patient";
+            userData = user.patient;
+        }
+        return {
+        id:user.id,
+        email:user.email,
+        role:user.role,
+        profile:userData,
+        createdAt: user.createdAt,
+        status:user.status
+    }
+    }) 
+    return structuredUsers
+}
+const getAllFromDB = async(params:any,options:IPaginationOptions)=>{
+    const {page,limit,skip} = calculatePagination((options as any))
+    const {searchTerm,...filterData} = params
+    const andConditions: Prisma.UserWhereInput[] = []
+    
+    if(params.searchTerm){
+        andConditions.push({
+            OR: usersearchalefields.map(field=>({
+                [field]:{
+                    contains:params.searchTerm,
+                    mode:"insensitive",
+                 }
+            }))
+        })
+    }
+    if(Object.keys(filterData).length>0){
+        andConditions.push({
+            AND: Object.keys(filterData).map(key=>({
+                [key] : {
+                    equals: (filterData as any)[key]
+                }
+            }))
+        })
+    }
+   
+    const whereConditions:Prisma.UserWhereInput =andConditions.length > 0 ? {AND: andConditions}:{}
+    const result = await prisma.user.findMany({
+        where: whereConditions,
+        skip,
+        take: limit,
+        orderBy: options.sortBy && options.sortOrder ? {
+            [options.sortBy]:options.sortOrder
+        }: {
+            createdAt: 'desc'
+        },
+        select: {
+            id:true,
+            email:true,
+            status:true,
+            role:true,
+            needsPasswordChange:true,
+            createdAt:true,
+            updatedAt:true,
+            admin:true,
+            patient:true,
+            doctor:true
+    }
+});
+    const total = await prisma.user.count({
+        where: whereConditions
+    })
+    return {
+        meta :{ 
+            page,
+            limit,
+            total
+        },
+        data: result
+    }
+}
+const changeProfileStatus = async(id:string,status:UserRole)=>{
+  const userdata = await prisma.user.findUniqueOrThrow({
+    where:{
+        id
+    }
+  })
+  const updateUserStatus = await prisma.user.update({
+    where:{
+        id,
+    },
+    data:status
+  })
+  return updateUserStatus
+}
 export const userService = {
     createAdmin,
     createDoctor,
-    createPatient
+    createPatient,
+    getAllFromDB,
+    getUsers,
+    changeProfileStatus
 }

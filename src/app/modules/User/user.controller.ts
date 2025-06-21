@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { userService } from "./user.service";
-
+import { catchAsync } from "../../../shared/catchAsync";
+import { sendResponse } from "../../../shared/sendresponse";
+import httpStatus from "http-status"
+import { get } from "http";
+import pick from "../../../shared/pick";
+import { userFilterableFoelds } from "./user.constant";
 const createAdmin = async (req:Request,res:Response,next:NextFunction) => {
     try {
         const result = await userService.createAdmin(req);
@@ -49,9 +54,44 @@ const createPatient = async (req:Request,res:Response,next:NextFunction) => {
       })  
     }
 }
-
+const getPatients = catchAsync(async(req:Request,res:Response)=>{
+  const result = await userService.getUsers(req)
+  sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success:true,
+    message:"User data retrieved Successfully",
+    data: result
+  })
+})
+const getAllFromDB= catchAsync(async(req,res)=>{  
+    const filters = pick(req.query,userFilterableFoelds)
+    const options = pick(req.query,['limit','page',"sortBy","sortOrder"])
+    const result = await userService.getAllFromDB(filters,options)
+  sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success:true,
+    message: "User data fetched successfully",
+    meta: result.meta,
+    data: result.data
+  })
+   } 
+)
+const changeProfileStatus = catchAsync(async(req,res)=>{
+  const {id} = req.params
+  const status = req.body
+  const result = await userService.changeProfileStatus(id,status)
+  sendResponse(res,{
+    statusCode: httpStatus.OK,
+    success:true,
+    message: "User status updated successfully",
+    data: result
+  })
+})
 export const userController = {
     createAdmin,
     createDoctor,
-    createPatient
+    createPatient,
+    getAllFromDB,
+    getPatients,
+    changeProfileStatus
 }

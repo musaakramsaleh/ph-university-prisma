@@ -26,5 +26,15 @@ router.post("/create-patient",upload.single('file'),
   req.body = userValidation.createPatient.parse(JSON.parse(req.body.data))
   return userController.createPatient(req,res,next)
 })
+router.get("/users",auth(UserRole.ADMIN,UserRole.SUPER_ADMIN),(req:Request,res:Response,next:NextFunction)=>{
+  return userController.getAllFromDB(req,res,next)
+})
+
+router.patch("/:id/status",auth(UserRole.ADMIN,UserRole.SUPER_ADMIN),
+  (req:Request,res:Response,next:NextFunction)=>{
+    req.body = userValidation.userStatus.parse(JSON.parse(req.body.status))
+    return userController.changeProfileStatus(req,res,next)
+  }
+)
 
 export const userRoutes = router
